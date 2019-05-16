@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>loyaltyone</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+  <div class="container" style="margin-top: 50px">
+    <div class="row">
+      <div class="col-lg-6 col-lg-offset-3">
+        <form id="post-form">
+
+          <div class="form-group">
+            <div class="row">
+              <div class="col-lg-4">
+                <label class="control-label">Enter Your Username</label>
+              </div>
+              <div class="col-lg-8">
+                <div class="input-group">
+                  <input class="form-control" id="username" type="text" name="username" required placeholder="Username">
+                  
+                </div>
+
+              </div>
+            </div>
+
+
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" name="post" id="post" placeholder="Enter Your Text"></textarea> 
+            <textarea class="form-control" name="city" id="city" placeholder="Enter Your city"></textarea>
+          </div>
+          <button type="submit" class="btn btn-default pull-right">Post</button>
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6 col-lg-offset-3">
+        <div id="post-data">
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+
+    $('#post-form').on('submit', (event) => {
+      event.preventDefault();
+      var username = $('#username').val();
+      var post = $('#post').val();
+      var id = Math.floor(Math.random() * 100000);
+
+      $.ajax({
+        type: "get",
+        data: $(event.target).serialize(),
+        url: "/api/NewMessage",
+        cache: false, contentType: false, processData: false,
+        success: (data) => {
+          console.log(data);
+
+          $("#post-data").append(`
+        <div class="media" id="${username}-${id}">
+          <div class="media-body">
+            <h4 class="media-heading text-primary">${username}</h4>
+            <p>${post}</p>
+            <button type="button" class="btn btn-link pull-right reply-btn">reply</button>
+          </div>
+          <div class="reply-data" style="padding-left:80px"></div>
+          <form class="reply-form hidden">
+            <div class="input-group">
+                <input type="text" class="form-control reply" placeholder="Reply" name="reply">
+                <input type="hidden" value=${data._id} hidden class="form-control reply" placeholder="Reply" name="id">
+                <div class="input-group-btn">
+                  <button class="btn btn-default" type="submit">Reply</button>
+                </div>
+            </div>
+          </form>
+          
+        </div>
+        <hr>
+        `);
+          $('#post').val("");
+        }, error: (err) => {
+          console.log(err);
+        }
+      })
+
+
+
+      
+
+
+    });
+
+
+
+    $(document).on('click', '.reply-btn', (event) => {
+      event.preventDefault();
+    
+      $(event.target).closest('.media').find('.reply-form').toggleClass('hidden')
+    });
+
+
+
+    $(document).on('submit', '.reply-form', (event) => {
+      event.preventDefault();
+      var reply = $(event.target).find('.reply').val();
+      console.log(reply);
+      var dataObject = $(event.target).closest('.media').find('.reply-data');
+      console.log(dataObject.html())
+      $.ajax({
+        type: "get",
+        data: $(event.target).serialize(),
+        url: "/api/Reply",
+        cache: false, contentType: false, processData: false,
+        success: (data) => {
+          console.log(data);
+          dataObject.append(`
+          <div class="media">
+            <div class="media-body">
+              <p>${reply}</p>
+            </div>
+          </div>
+        `);
+          $(event.target)[0].reset();
+        }
+      });
+
+    });
+
+
+    $('#refresh').on('click', (event) => {
+      event.preventDefault()
+      var username = $('#username').val()
+    });
+  </script>
+</body>
+
+</html>
