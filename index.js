@@ -4,6 +4,7 @@ let app =express();
 let path = require("path");
 let repo = require("./repository/repo");
 let fs=require("fs");
+let https = require('https');
 
 
 const router = express.Router();
@@ -57,13 +58,23 @@ app.get('/api/Reply', async (req, res) => {
 });
 
 
-
+var privateKey = fs.readFileSync('server.key');
+var certificate = fs.readFileSync('server.cert');
+var credentials = { key: privateKey, cert: certificate };
 
 app.use('/', router);
 const port=3000;
+const ports=3001;
 
 let httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
 httpServer.listen(port, (r, e) => {
     console.log("listining on port 3000");
+   
+});
+
+httpsServer.listen(ports, (r, e) => {
+    console.log("listining on port 3001");
    
 });

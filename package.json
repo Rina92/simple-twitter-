@@ -19,6 +19,8 @@
   "dependencies": {
     "express.js": "^1.0.0",
     "g": "^2.0.1",
-    "mongodb": "^3.2.4"
+    "mongodb": "^3.2.4",
+    "mocha": "^6.1.4",
+    "nodemon": "^1.19.0"
   }
 }
